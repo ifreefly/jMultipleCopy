@@ -5,16 +5,21 @@
  * version:0.1
  * nextVersionDescription:实现多线程下载
  * */
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.ThreadGroup;
+import java.net.HttpURLConnection;
+import java.net.URL;
+//import httpDownload;
 import static java.lang.System.*;
 
 class save_thread extends Thread {
 	private String name;
-	private FileInputStream input=null;
+	//private FileInputStream input=null;
+	BufferedInputStream input=null; 
 	private RandomAccessFile rfwrite=null;
 	private long beginPos=0,endPos=0,currentPos=0;
 	private int c;
@@ -32,11 +37,16 @@ class save_thread extends Thread {
 	@Override
 	public void run() {
 		try{
-		String srcFile="/src/myproject.zip";
-		String desFile="/src/des.zip";
-		File in=new File(srcFile);
+		//String srcFile="/src/myproject.zip";
+		String desFile="/home/dell/workspace/copy_java/src/des.mp3";
+		String srcFile="http://localhost/src.mp3";
+		//File in=new File(srcFile);
+		//BufferedInputStream in = null ;
+		URL url=new URL(srcFile);
+		HttpURLConnection httpurl=(HttpURLConnection)url.openConnection();
 		rfwrite=new RandomAccessFile(desFile,"rw");
-		input= new FileInputStream(in);
+		//input= new FileInputStream(in);
+		input = new BufferedInputStream(httpurl.getInputStream());
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -49,22 +59,12 @@ class save_thread extends Thread {
 			rfwrite.seek(skip_bytes);
 			out.println();
 			while((c=input.read(b))!=-1){
-				//out.println("线程"+name+"在活动");
 				currentPos+=c;
 				if(currentPos>=endPos){//该块已传输结束
-					//out.println(">endPos读取的文件有"+(c-(currentPos-endPos)));//currentPos-endPos为超出自己本块的数据量
 					rfwrite.write(b, 0, (c-(int)((currentPos-endPos))));
-					//if(name!="4"){
-					//	System.out.println("线程"+name+"最后一个写入字节数"+(c-(int)((currentPos-endPos))));
-					//}else{
-						System.out.println("线程"+name+"最后一个写入字节数"+c);
-					//}
-					//currentPos=endPos+1;
 					break;
 				}else{
-					//out.println("读取的文件有"+c);
 					rfwrite.write(b);
-					//System.out.println("线程"+name+"最后一个写入字节数"+(c-(int)((currentPos-endPos))));
 				}
 			}
 			out.println("线程"+name+"结束字节是"+currentPos);
@@ -78,22 +78,25 @@ class save_thread extends Thread {
 	
 }
 public class cp {
-	//private int fileLength=0;
 	private long fileLength=0;
 	int threads=5;
 	long blocks=0;
 	private long beginPos=0,endPos=0;
-	//byte b[]=new byte[4*1024];
+	private httpDownload httpdown=new httpDownload("http://localhost/src.mp3");
 	protected void cp_file() throws IOException{
-		System.out.println(System.getProperty("user.dir"));
+		/*System.out.println(System.getProperty("user.dir"));
 		String srcFile="/src/myproject.zip";
 		File input=new File(srcFile);
-		fileLength=input.length();
+		fileLength=input.length();*/
+		fileLength=new Long(httpdown.getContentLength());
 		// TODO Auto-generated catch block					
 		ThreadGroup tg=new ThreadGroup("download");
 		out.println(fileLength);
 		long starttime=System.currentTimeMillis();//毫秒记
 		blocks=fileLength/threads;
+		if(fileLength<=0){//无法从服务器获取文件长度，采用单线程下载
+			setThreads(1);
+		}
 		for(int i=0;i<threads;i++){
 			if(i!=threads-1)
 				endPos=beginPos+blocks;
@@ -115,11 +118,16 @@ public class cp {
 			}  
         }  
 		in.close();
-		//rfwrite.close();
 		long endtime=System.currentTimeMillis();
 		long usetime=(endtime-starttime)/1000;
 		out.println("复制用时"+usetime);
 		out.println("end");
+	}
+	public int getThreads() {
+		return threads;
+	}
+	public void setThreads(int threads) {
+		this.threads = threads;
 	}
 	public static void main(String args[]) throws IOException{
 		cp mycp=new cp();
