@@ -13,12 +13,10 @@ import java.io.RandomAccessFile;
 import java.lang.ThreadGroup;
 import java.net.HttpURLConnection;
 import java.net.URL;
-//import httpDownload;
 import static java.lang.System.*;
 
 class save_thread extends Thread {
 	private String name;
-	//private FileInputStream input=null;
 	BufferedInputStream input=null; 
 	private RandomAccessFile rfwrite=null;
 	private long beginPos=0,endPos=0,currentPos=0;
@@ -37,15 +35,11 @@ class save_thread extends Thread {
 	@Override
 	public void run() {
 		try{
-		//String srcFile="/src/myproject.zip";
 		String desFile="/home/dell/workspace/copy_java/src/des.mp3";
-		String srcFile="http://localhost/src.mp3";
-		//File in=new File(srcFile);
-		//BufferedInputStream in = null ;
+		String srcFile="http://mylzu.net/copyjava.mp3";
 		URL url=new URL(srcFile);
 		HttpURLConnection httpurl=(HttpURLConnection)url.openConnection();
 		rfwrite=new RandomAccessFile(desFile,"rw");
-		//input= new FileInputStream(in);
 		input = new BufferedInputStream(httpurl.getInputStream());
 		}catch(IOException e){
 			e.printStackTrace();
@@ -82,12 +76,8 @@ public class cp {
 	int threads=5;
 	long blocks=0;
 	private long beginPos=0,endPos=0;
-	private httpDownload httpdown=new httpDownload("http://localhost/src.mp3");
+	private httpDownload httpdown=new httpDownload("http://mylzu.net/copyjava.mp3");
 	protected void cp_file() throws IOException{
-		/*System.out.println(System.getProperty("user.dir"));
-		String srcFile="/src/myproject.zip";
-		File input=new File(srcFile);
-		fileLength=input.length();*/
 		fileLength=new Long(httpdown.getContentLength());
 		// TODO Auto-generated catch block					
 		ThreadGroup tg=new ThreadGroup("download");
@@ -97,6 +87,10 @@ public class cp {
 		if(fileLength<=0){//无法从服务器获取文件长度，采用单线程下载
 			setThreads(1);
 		}
+		if(httpdown.getContentRange()==null){//服务器不支持断点续传，采用单线程下载
+			setThreads(1);
+		}
+		//long starttime=System.currentTimeMillis();
 		for(int i=0;i<threads;i++){
 			if(i!=threads-1)
 				endPos=beginPos+blocks;
@@ -109,7 +103,7 @@ public class cp {
 			beginPos=endPos;
 		}
 		while (tg.activeCount() > 0) {  
-			out.println("活动线程有"+tg.activeCount());
+			//out.println("活动线程有"+tg.activeCount());
             try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
