@@ -5,10 +5,8 @@
  * version:0.1
  * nextVersionDescription:实现多线程下载
  * */
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.ThreadGroup;
 import java.net.HttpURLConnection;
@@ -17,7 +15,8 @@ import static java.lang.System.*;
 
 class save_thread extends Thread {
 	private String name;
-	BufferedInputStream input=null; 
+	private String contentRange;
+	InputStream input=null; 
 	private RandomAccessFile rfwrite=null;
 	private long beginPos=0,endPos=0,currentPos=0;
 	private int c;
@@ -30,35 +29,40 @@ class save_thread extends Thread {
 		this.name=name;
 		this.beginPos=beginPos;
 		this.endPos=endPos;
+		currentPos=beginPos;
 	}
 
 	@Override
 	public void run() {
 		try{
 		String desFile="/home/dell/workspace/copy_java/src/des.mp3";
-		String srcFile="http://mylzu.net/copyjava.mp3";
+		String srcFile="http://mylzu.net/src12.mp3";
 		URL url=new URL(srcFile);
 		HttpURLConnection httpurl=(HttpURLConnection)url.openConnection();
 		rfwrite=new RandomAccessFile(desFile,"rw");
-		input = new BufferedInputStream(httpurl.getInputStream());
+		httpurl.setRequestProperty("User-Agent", "jmultidownload");//设置user-agent
+		contentRange="bytes="+beginPos+"-";//设置文件流开始位置
+		httpurl.setRequestProperty("RANGE", contentRange);//设置文件流开始位置
+		out.println("线程"+name+"ContentRange="+httpurl.getHeaderField("Content-Range"));
+		input = httpurl.getInputStream();
+		rfwrite.seek(beginPos);
+		out.println();
+		out.println("线程"+name+"开始字节是"+currentPos);
+		out.println("线程"+name+"理论结束字节是"+endPos);
+		out.println();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 		// TODO Auto-generated method stub
 		try {
-			currentPos=beginPos;
-			out.println("线程"+name+"开始字节是"+beginPos);
-			out.println("线程"+name+"理论结束字节是"+endPos);
-			long skip_bytes=input.skip(beginPos);
-			rfwrite.seek(skip_bytes);
-			out.println();
-			while((c=input.read(b))!=-1){
+			while((c=input.read(b,0,1024))>0){
 				currentPos+=c;
 				if(currentPos>=endPos){//该块已传输结束
 					rfwrite.write(b, 0, (c-(int)((currentPos-endPos))));
+					//currentPos+=(c-(int)((currentPos-endPos)));
 					break;
 				}else{
-					rfwrite.write(b);
+					rfwrite.write(b,0,c);
 				}
 			}
 			out.println("线程"+name+"结束字节是"+currentPos);
@@ -76,18 +80,16 @@ public class cp {
 	int threads=5;
 	long blocks=0;
 	private long beginPos=0,endPos=0;
-	private httpDownload httpdown=new httpDownload("http://mylzu.net/copyjava.mp3");
+	private httpDownload httpdown=new httpDownload("http://mylzu.net/src12.mp3");
 	protected void cp_file() throws IOException{
 		fileLength=new Long(httpdown.getContentLength());
 		// TODO Auto-generated catch block					
 		ThreadGroup tg=new ThreadGroup("download");
-		out.println(fileLength);
+		out.println("文件长度为"+fileLength);
 		long starttime=System.currentTimeMillis();//毫秒记
 		blocks=fileLength/threads;
 		if(fileLength<=0){//无法从服务器获取文件长度，采用单线程下载
-			setThreads(1);
-		}
-		if(httpdown.getContentRange()==null){//服务器不支持断点续传，采用单线程下载
+			out.println("单线程下载");
 			setThreads(1);
 		}
 		//long starttime=System.currentTimeMillis();
@@ -111,7 +113,6 @@ public class cp {
 				e.printStackTrace();
 			}  
         }  
-		in.close();
 		long endtime=System.currentTimeMillis();
 		long usetime=(endtime-starttime)/1000;
 		out.println("复制用时"+usetime);
