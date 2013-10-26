@@ -9,13 +9,8 @@ package downloadcore;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.lang.ThreadGroup;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import static java.lang.System.*;
-
+import java.text.DecimalFormat;//设置浮点运算格式而导入的包
 
 public class cp {
 	private String srcFile,desPath,desFile;
@@ -25,6 +20,7 @@ public class cp {
 	private long beginPos=0,endPos=0;
 	private httpDownload httpdown;
 	private File spaceDetect,progressReport;
+	private DecimalFormat decimalFormate=new DecimalFormat("0.00");
 	public cp(String srcFile,String desPath) throws IOException{
 		this.srcFile=srcFile;
 		this.desPath=desPath;
@@ -38,24 +34,24 @@ public class cp {
 	}
 	
 	protected void cp_init() throws IOException{
-		//System.out.println(desPath);
-		//System.out.println(httpdown.getFileName());
-		httpdown=new httpDownload(srcFile);
-		desFile=desPath+"/"+httpdown.getFileName();
-		httpdown=new httpDownload(srcFile);
-		spaceDetect=new File(desPath);
-		progressReport=new File(desFile);
-		cp_file();
+		//if(srcFile.length()==0){//注：需要增加链接匹配功能
+			httpdown=new httpDownload(srcFile);
+			desFile=desPath+"/"+httpdown.getFileName();
+			httpdown=new httpDownload(srcFile);
+			spaceDetect=new File(desPath);
+			progressReport=new File(desFile);
+			cp_file();
+		//}
 	}
 	protected void cp_file() throws IOException{
 		fileLength=new Long(httpdown.getContentLength());
 		// TODO Auto-generated catch block					
 		ThreadGroup tg=new ThreadGroup("download");
-		out.println("文件长度为"+fileLength);
+		//out.println("文件长度为"+fileLength);
 		long starttime=System.currentTimeMillis();//毫秒记
 		blocks=fileLength/threads;
 		if(fileLength<=0){//无法从服务器获取文件长度，采用单线程下载
-			out.println("单线程下载");
+			//out.println("单线程下载");
 			setThreads(1);
 		}
 		if(fileLength>0&&fileLength>spaceDetect.getFreeSpace()){
@@ -74,9 +70,10 @@ public class cp {
 		}
 		while (tg.activeCount() > 0) {//监测任务是否完成同时计算文件大小并报告进度  
 			//out.println("活动线程有"+tg.activeCount());
-			out.println("下载已完成"+progressReport.length()/fileLength+"%");
+			out.println("下载完成字节数"+progressReport.length());
+			out.println("下载已完成"+(decimalFormate.format(progressReport.length()*100/(float)fileLength))+"%");
             try {
-				Thread.sleep(5);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

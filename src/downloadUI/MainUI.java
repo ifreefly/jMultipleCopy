@@ -7,9 +7,12 @@
  * */
 package downloadUI;
 
+
+
 public class MainUI {
-	private FrameUI mainUI;
+	//private FrameUI mainUI;
 	public MainUI(){
-		mainUI=new FrameUI("download");
+		//mainUI=new FrameUI("download");
+		new FrameUI("download");
 	}
 }

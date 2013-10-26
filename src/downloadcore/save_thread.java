@@ -1,7 +1,5 @@
 package downloadcore;
 
-import static java.lang.System.out;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -39,13 +37,15 @@ public class save_thread extends Thread {
 		httpurl.setRequestProperty("User-Agent", "jmultidownload");//设置user-agent
 		contentRange="bytes="+beginPos+"-";//设置文件流开始位置
 		httpurl.setRequestProperty("RANGE", contentRange);//设置文件流开始位置
-		out.println("线程"+name+"ContentRange="+httpurl.getHeaderField("Content-Range"));
+		//out.println("线程"+name+"ContentRange="+httpurl.getHeaderField("Content-Range"));
 		input = httpurl.getInputStream();
 		rfwrite.seek(beginPos);
-		out.println();
+		/*调试代码
+		 * out.println();
 		out.println("线程"+name+"开始字节是"+currentPos);
 		out.println("线程"+name+"理论结束字节是"+endPos);
 		out.println();
+		*/
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -60,7 +60,7 @@ public class save_thread extends Thread {
 					rfwrite.write(b,0,c);
 				}
 			}
-			out.println("线程"+name+"结束字节是"+currentPos);
+			//out.println("线程"+name+"结束字节是"+currentPos);
 			input.close();
 			rfwrite.close();
 		} catch (IOException e) {

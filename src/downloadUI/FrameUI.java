@@ -22,6 +22,7 @@ public class FrameUI extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private DownloadPanel downloadUI;
 	String url=null;
 	public String getUrl() {
 		return url;
@@ -29,6 +30,9 @@ public class FrameUI extends JFrame{
 
 	public FrameUI(String name){
 		super(name);
+		//System.out.println("frameok");
+		setLayout(null);
+		downloadUI=new DownloadPanel();
 		JMenuBar menuBar=new JMenuBar();
 		JMenuItem newMenu=new JMenuItem("New");
 		JMenuItem helpMenu=new JMenuItem("Help");
@@ -39,7 +43,9 @@ public class FrameUI extends JFrame{
 		menuListener menulistener=new menuListener();
 		newMenu.addActionListener(menulistener);
 		helpMenu.addActionListener(menulistener);
-		setSize(400,200);
+		//downloadUI.setBounds(0,0,350,82);
+		add(downloadUI);
+		setSize(500,400);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -52,8 +58,11 @@ public class FrameUI extends JFrame{
 			//System.out.println("hello world");
 			if(cmd.equals("New")){
 				url=JOptionPane.showInputDialog(null,"请输入一个链接");
+				//System.out.println(url);
 				try {
-					cp newcp=new cp(url);
+					if(url!=null){
+						cp newcp=new cp(url);
+					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
