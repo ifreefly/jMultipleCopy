@@ -12,15 +12,22 @@ import java.io.IOException;
 import static java.lang.System.*;
 import java.text.DecimalFormat;//设置浮点运算格式而导入的包
 
+//import time.timetask;
+
 public class cp {
 	private String srcFile,desPath,desFile;
 	private long fileLength=0;
-	int threads=5;
+	int threads=1;//默认线程是5
 	long blocks=0;
 	private long beginPos=0,endPos=0;
 	private httpDownload httpdown;
 	private File spaceDetect,progressReport;
 	private DecimalFormat decimalFormate=new DecimalFormat("0.00");
+	private int progressValue;
+	private String progressString;
+	
+
+	ThreadGroup tg;
 	public cp(String srcFile,String desPath) throws IOException{
 		this.srcFile=srcFile;
 		this.desPath=desPath;
@@ -43,10 +50,16 @@ public class cp {
 			cp_file();
 		//}
 	}
+	
+	protected void monitorDownload(){
+		setProgressValue();
+		setProgressString();
+	}
+	
 	protected void cp_file() throws IOException{
 		fileLength=new Long(httpdown.getContentLength());
 		// TODO Auto-generated catch block					
-		ThreadGroup tg=new ThreadGroup("download");
+		tg=new ThreadGroup("download");
 		//out.println("文件长度为"+fileLength);
 		long starttime=System.currentTimeMillis();//毫秒记
 		blocks=fileLength/threads;
@@ -62,13 +75,13 @@ public class cp {
 				endPos=beginPos+blocks;
 			else{
 				endPos=fileLength;
-				out.println(i+"个"+endPos);
+				//out.println(i+"个"+endPos);
 			}
 			save_thread download=new save_thread(tg,Integer.toString(i),srcFile,desFile,beginPos,endPos);
 			download.start();
 			beginPos=endPos;
 		}
-		while (tg.activeCount() > 0) {//监测任务是否完成同时计算文件大小并报告进度  
+		/*while (tg.activeCount() > 0) {//监测任务是否完成同时计算文件大小并报告进度  
 			//out.println("活动线程有"+tg.activeCount());
 			out.println("下载完成字节数"+progressReport.length());
 			out.println("下载已完成"+(decimalFormate.format(progressReport.length()*100/(float)fileLength))+"%");
@@ -78,7 +91,7 @@ public class cp {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}  
-        }  
+        }*/  
 		long endtime=System.currentTimeMillis();
 		long usetime=(endtime-starttime)/1000;
 		out.println("复制用时"+usetime);
@@ -94,4 +107,25 @@ public class cp {
 		
 		out.println("ok");
 	}*/
+
+	public int getProgressValue() {
+		return progressValue;
+	}
+
+	public void setProgressValue() {
+		this.progressValue = (int) (progressReport.length()*100/fileLength);
+	}
+	public String getProgressString() {
+		return progressString;
+	}
+	public void setProgressString() {
+		this.progressString = decimalFormate.format(progressReport.length()*100/(float)fileLength);
+	}
+	public httpDownload getHttpdown() {
+		return httpdown;
+	}
+	public long getFileLength() {
+		return fileLength;
+	}
+	
 }

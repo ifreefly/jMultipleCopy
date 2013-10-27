@@ -8,7 +8,10 @@
 
 package downloadUI;
 
+import downloadcore.cp;
+
 import java.awt.Color;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -16,7 +19,15 @@ import javax.swing.JLabel;
 
 public class DownloadPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
+	private String filedownloadHead=new String("文件已下载:");
 	private JProgressBar downloadProgress;
+	private cp newcp;
+	public JProgressBar getDownloadProgress() {
+		return downloadProgress;
+	}
+
+
+
 	private JLabel fileTypeIconLabel,fileNameLabel,downloadInfoLabel,freeLabel;
 	protected void initDownloadPanel(){
 		downloadProgress=new JProgressBar(0,100);
@@ -24,7 +35,6 @@ public class DownloadPanel extends JPanel{
 		fileNameLabel=new JLabel("fileNameLabel");
 		downloadInfoLabel=new JLabel("downloadInfoLabel");
 		freeLabel=new JLabel("freeLabel");
-		System.out.println("初始化完成");
 		downloadProgress.setBounds(80, 44, 400, 18);
 		downloadProgress.setStringPainted(true);
 		downloadProgress.setString("88%");
@@ -42,16 +52,32 @@ public class DownloadPanel extends JPanel{
 		freeLabel.setBackground(Color.lightGray);//测试用，检测位置，可删除
 		freeLabel.setOpaque(true);//测试用，检测位置，可删除
 		//containProgress.set
-	}
-	public DownloadPanel(){
-		System.out.println("ok");
-		setLayout(null);
-		setBounds(0,0,350,82);
-		initDownloadPanel();
 		add(downloadProgress);
 		add(fileTypeIconLabel);
 		add(fileNameLabel);
 		add(downloadInfoLabel);
 		add(freeLabel);	
+	}
+	
+	public void setInitInfo(String fileName,long downloaded,long fileLength,String progressString,int progressValue){//当从配置文件读取数据文件时或者新建一个下载时设置文件信息
+		fileNameLabel.setText(fileName);
+		downloadInfoLabel.setText((filedownloadHead+downloaded+"/"+fileLength));
+		downloadProgress.setValue(progressValue);
+		downloadProgress.setString(progressString);
+	}
+	
+	public DownloadPanel(String url) throws IOException{
+		setLayout(null);
+		//setBounds(0,0,350,82);
+		initDownloadPanel();
+		newcp=new cp(url);
+		setInitInfo(newcp.getHttpdown().getFileName(), 0, newcp.getFileLength(), "0.00", 0);
+	}
+	
+	public DownloadPanel() throws IOException{
+		System.out.println("ok");
+		setLayout(null);
+		//setBounds(0,0,350,82);
+		initDownloadPanel();
 	}
 }

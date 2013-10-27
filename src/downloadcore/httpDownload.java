@@ -11,13 +11,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.HttpURLConnection;
 public class httpDownload {
-	private String srcFile;
+	//private String srcFile;
 	private String ContentLength,ContentRange;
 	private URL url=null;
 	private HttpURLConnection httpUrl=null;
 	private String fileName;
 	public httpDownload(String srcFile){
-		this.srcFile=srcFile;
+		//this.srcFile=srcFile;
 		setFileName(srcFile);
 		try {
 			url=new URL(srcFile);

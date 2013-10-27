@@ -12,6 +12,8 @@ import downloadcore.cp;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.TimerTask;
+
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -22,7 +24,6 @@ public class FrameUI extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private DownloadPanel downloadUI;
 	String url=null;
 	public String getUrl() {
 		return url;
@@ -30,25 +31,27 @@ public class FrameUI extends JFrame{
 
 	public FrameUI(String name){
 		super(name);
-		//System.out.println("frameok");
 		setLayout(null);
-		downloadUI=new DownloadPanel();
 		JMenuBar menuBar=new JMenuBar();
 		JMenuItem newMenu=new JMenuItem("New");
 		JMenuItem helpMenu=new JMenuItem("Help");
-		//JMenuItem testMenuItem=new JMenuItem("test");
 		setJMenuBar(menuBar);
 		menuBar.add(newMenu);
 		menuBar.add(helpMenu);
 		menuListener menulistener=new menuListener();
 		newMenu.addActionListener(menulistener);
 		helpMenu.addActionListener(menulistener);
-		//downloadUI.setBounds(0,0,350,82);
-		add(downloadUI);
+		//addNewDownloadPanel();
 		setSize(500,400);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+	
+	private void addNewDownloadPanel(DownloadPanel newDownload,int x,int y){
+		newDownload.setBounds(0,82*x,350,82);
+		add(newDownload);
+	}
+	
 	class menuListener implements ActionListener{
 
 		@Override
@@ -60,8 +63,21 @@ public class FrameUI extends JFrame{
 				url=JOptionPane.showInputDialog(null,"请输入一个链接");
 				//System.out.println(url);
 				try {
+					/*DownloadPanel newDownloadtest=null;//=new DownloadPanel();
+					for(int i=0;i<2;i++){
+						newDownloadtest=new DownloadPanel();
+						addNewDownloadPanel(newDownloadtest,i,30);
+						repaint();
+					}
+					remove(newDownloadtest);
+					newDownloadtest.getDownloadProgress().setString("hello world");*/
 					if(url!=null){
-						cp newcp=new cp(url);
+						DownloadPanel newDownload=new DownloadPanel(url);
+						addNewDownloadPanel(newDownload,0,30);
+						repaint();
+						//cp newcp=new cp(url);
+						//newDownload.setInitInfo(newcp.getHttpdown().getFileName(), 0, newcp.getFileLength(), "0.00", 0);
+						//new cp(url);
 					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -71,6 +87,15 @@ public class FrameUI extends JFrame{
 			else if(cmd.equals("Help")){
 				JOptionPane.showMessageDialog(FrameUI.this, "test");
 			}
+		}	
+	}
+	
+	class monitorTask extends TimerTask{
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
 		}
 		
 	}
