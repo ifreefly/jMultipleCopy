@@ -25,9 +25,8 @@ public class cp {
 	private DecimalFormat decimalFormate=new DecimalFormat("0.00");
 	private int progressValue;
 	private String progressString;
+	private ThreadGroup tg;
 	
-
-	ThreadGroup tg;
 	public cp(String srcFile,String desPath) throws IOException{
 		this.srcFile=srcFile;
 		this.desPath=desPath;
@@ -51,7 +50,7 @@ public class cp {
 		//}
 	}
 	
-	protected void monitorDownload(){
+	public void monitorDownload(){
 		setProgressValue();
 		setProgressString();
 	}
@@ -81,21 +80,28 @@ public class cp {
 			download.start();
 			beginPos=endPos;
 		}
-		/*while (tg.activeCount() > 0) {//监测任务是否完成同时计算文件大小并报告进度  
-			//out.println("活动线程有"+tg.activeCount());
-			out.println("下载完成字节数"+progressReport.length());
-			out.println("下载已完成"+(decimalFormate.format(progressReport.length()*100/(float)fileLength))+"%");
-            try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}  
-        }*/  
+		
 		long endtime=System.currentTimeMillis();
 		long usetime=(endtime-starttime)/1000;
 		out.println("复制用时"+usetime);
 	}
+	/*public boolean monitorCp(){
+		/*while (tg.activeCount() > 0) {//监测任务是否完成同时计算文件大小并报告进度  
+		//out.println("活动线程有"+tg.activeCount());
+		out.println("下载完成字节数"+progressReport.length());
+		out.println("下载已完成"+(decimalFormate.format(progressReport.length()*100/(float)fileLength))+"%");
+        try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+    	}*/  
+		/*if(tg.activeCount()>0)//判别条件有待改进
+			return false;//还没下载完
+		else
+			return true;
+	}*/
 	public int getThreads() {
 		return threads;
 	}
@@ -114,12 +120,14 @@ public class cp {
 
 	public void setProgressValue() {
 		this.progressValue = (int) (progressReport.length()*100/fileLength);
+		//System.out.println(progressValue);
 	}
 	public String getProgressString() {
 		return progressString;
 	}
 	public void setProgressString() {
 		this.progressString = decimalFormate.format(progressReport.length()*100/(float)fileLength);
+		//System.out.println(progressString+"%");
 	}
 	public httpDownload getHttpdown() {
 		return httpdown;
@@ -127,5 +135,10 @@ public class cp {
 	public long getFileLength() {
 		return fileLength;
 	}
-	
+	public File getProgressReport() {
+		return progressReport;
+	}
+	public ThreadGroup getTg() {
+		return tg;
+	}
 }

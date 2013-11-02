@@ -7,12 +7,9 @@
 
 package downloadUI;
 
-import downloadcore.cp;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -47,8 +44,8 @@ public class FrameUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	private void addNewDownloadPanel(DownloadPanel newDownload,int x,int y){
-		newDownload.setBounds(0,82*x,350,82);
+	private void addNewDownloadPanel(DownloadPanel newDownload,int i){
+		newDownload.setBounds(0,82*i,480,82);
 		add(newDownload);
 	}
 	
@@ -73,13 +70,14 @@ public class FrameUI extends JFrame{
 					newDownloadtest.getDownloadProgress().setString("hello world");*/
 					if(url!=null){
 						DownloadPanel newDownload=new DownloadPanel(url);
-						addNewDownloadPanel(newDownload,0,30);
+						addNewDownloadPanel(newDownload,0);
 						repaint();
+						newDownload.getMonitorProgress().start();
 						//cp newcp=new cp(url);
 						//newDownload.setInitInfo(newcp.getHttpdown().getFileName(), 0, newcp.getFileLength(), "0.00", 0);
 						//new cp(url);
 					}
-				} catch (IOException e1) {
+				} catch (IOException | InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -90,13 +88,5 @@ public class FrameUI extends JFrame{
 		}	
 	}
 	
-	class monitorTask extends TimerTask{
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
+	
 }

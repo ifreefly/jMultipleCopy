@@ -12,7 +12,6 @@ import downloadcore.cp;
 
 import java.awt.Color;
 import java.io.IOException;
-
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JLabel;
@@ -22,13 +21,9 @@ public class DownloadPanel extends JPanel{
 	private String filedownloadHead=new String("ÎÄ¼þÒÑÏÂÔØ:");
 	private JProgressBar downloadProgress;
 	private cp newcp;
-	public JProgressBar getDownloadProgress() {
-		return downloadProgress;
-	}
-
-
-
+	private MonitorProgress monitorProgress;
 	private JLabel fileTypeIconLabel,fileNameLabel,downloadInfoLabel,freeLabel;
+	private boolean isDownloaded=false;
 	protected void initDownloadPanel(){
 		downloadProgress=new JProgressBar(0,100);
 		fileTypeIconLabel=new JLabel("test");
@@ -37,7 +32,7 @@ public class DownloadPanel extends JPanel{
 		freeLabel=new JLabel("freeLabel");
 		downloadProgress.setBounds(80, 44, 400, 18);
 		downloadProgress.setStringPainted(true);
-		downloadProgress.setString("88%");
+		//downloadProgress.setString("88%");
 		fileTypeIconLabel.setBounds(0, 0, 80, 80);
 		fileTypeIconLabel.setBackground(Color.cyan);//²âÊÔÓÃ£¬¼ì²âÍ¼±êÎ»ÖÃ£¬¿ÉÉ¾³ý
 		fileTypeIconLabel.setOpaque(true);//²âÊÔÓÃ£¬¼ì²âÎ»ÖÃ£¬¿ÉÉ¾³ý
@@ -47,11 +42,10 @@ public class DownloadPanel extends JPanel{
 		downloadInfoLabel.setBounds(80, 22, 400, 22);
 		downloadInfoLabel.setBackground(Color.red);//²âÊÔÓÃ£¬¼ì²âÎ»ÖÃ£¬¿ÉÉ¾³ý
 		downloadInfoLabel.setOpaque(true);//²âÊÔÓÃ£¬¼ì²âÎ»ÖÃ£¬¿ÉÉ¾³ý
-		downloadProgress.setValue(50);
+		//downloadProgress.setValue(50);
 		freeLabel.setBounds(80, 62, 400, 18);
 		freeLabel.setBackground(Color.lightGray);//²âÊÔÓÃ£¬¼ì²âÎ»ÖÃ£¬¿ÉÉ¾³ý
 		freeLabel.setOpaque(true);//²âÊÔÓÃ£¬¼ì²âÎ»ÖÃ£¬¿ÉÉ¾³ý
-		//containProgress.set
 		add(downloadProgress);
 		add(fileTypeIconLabel);
 		add(fileNameLabel);
@@ -63,13 +57,14 @@ public class DownloadPanel extends JPanel{
 		fileNameLabel.setText(fileName);
 		downloadInfoLabel.setText((filedownloadHead+downloaded+"/"+fileLength));
 		downloadProgress.setValue(progressValue);
-		downloadProgress.setString(progressString);
+		downloadProgress.setString(progressString+"%");
 	}
 	
-	public DownloadPanel(String url) throws IOException{
+	public DownloadPanel(String url) throws IOException, InterruptedException{
 		setLayout(null);
 		//setBounds(0,0,350,82);
 		initDownloadPanel();
+		monitorProgress=new MonitorProgress();
 		newcp=new cp(url);
 		setInitInfo(newcp.getHttpdown().getFileName(), 0, newcp.getFileLength(), "0.00", 0);
 	}
@@ -79,5 +74,41 @@ public class DownloadPanel extends JPanel{
 		setLayout(null);
 		//setBounds(0,0,350,82);
 		initDownloadPanel();
+	}
+	
+	public MonitorProgress getMonitorProgress() {
+		return monitorProgress;
+	}
+
+	public JProgressBar getDownloadProgress() {
+		return downloadProgress;
+	}
+
+	public boolean isDownloaded() {
+		return isDownloaded;
+	}
+
+	public void setDownloaded(boolean isDownloaded) {
+		this.isDownloaded = isDownloaded;
+	}
+
+	public class MonitorProgress extends Thread{
+		public void run(){
+			while(!isDownloaded){
+				while(newcp.getTg().activeCount()>0||newcp.getProgressReport().length()<newcp.getFileLength()){
+					newcp.monitorDownload();
+					setInitInfo(newcp.getHttpdown().getFileName(), newcp.getProgressReport().length(), newcp.getFileLength(), newcp.getProgressString(), newcp.getProgressValue());
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				setDownloaded(true);
+			}
+			newcp.monitorDownload();
+			setInitInfo(newcp.getHttpdown().getFileName(), newcp.getProgressReport().length(), newcp.getFileLength(), newcp.getProgressString(), newcp.getProgressValue());
+		}
 	}
 }

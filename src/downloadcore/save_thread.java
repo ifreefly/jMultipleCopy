@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class save_thread extends Thread {
-	private String name;
+	//private String name;
 	private String contentRange;
 	private String srcFile,desFile;
 	InputStream input=null; 
@@ -15,12 +15,12 @@ public class save_thread extends Thread {
 	private long beginPos=0,endPos=0,currentPos=0;
 	private int c;
 	private byte b[]=new byte[1024];
-	public save_thread(String name){
+	/*public save_thread(String name){
 		this.name=name;
-	}
+	}*/
 	public save_thread(ThreadGroup tg,String name,String srcFile,String desFile,long beginPos,long endPos){
 		super(tg,name);
-		this.name=name;
+		//this.name=name;
 		this.beginPos=beginPos;
 		this.endPos=endPos;
 		this.srcFile=srcFile;
