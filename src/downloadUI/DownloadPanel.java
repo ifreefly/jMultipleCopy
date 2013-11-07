@@ -9,6 +9,7 @@
 package downloadUI;
 
 import downloadcore.cp;
+import actionListener.PanelMouseListener;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -24,7 +25,9 @@ public class DownloadPanel extends JPanel{
 	private MonitorProgress monitorProgress;
 	private JLabel fileTypeIconLabel,fileNameLabel,downloadInfoLabel,freeLabel;
 	private boolean isDownloaded=false;
+	private PanelMouseListener panelMouseListener;
 	protected void initDownloadPanel(){
+		panelMouseListener=new PanelMouseListener();
 		downloadProgress=new JProgressBar(0,100);
 		fileTypeIconLabel=new JLabel("test");
 		fileNameLabel=new JLabel("fileNameLabel");
@@ -46,6 +49,7 @@ public class DownloadPanel extends JPanel{
 		freeLabel.setBounds(80, 62, 400, 18);
 		freeLabel.setBackground(Color.lightGray);//≤‚ ‘”√£¨ºÏ≤‚Œª÷√£¨ø……æ≥˝
 		freeLabel.setOpaque(true);//≤‚ ‘”√£¨ºÏ≤‚Œª÷√£¨ø……æ≥˝
+		addMouseListener(panelMouseListener);
 		add(downloadProgress);
 		add(fileTypeIconLabel);
 		add(fileNameLabel);
