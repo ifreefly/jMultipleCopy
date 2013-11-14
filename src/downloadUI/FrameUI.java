@@ -73,9 +73,10 @@ public class FrameUI extends JFrame{
 						addNewDownloadPanel(newDownload,0);
 						repaint();
 						newDownload.getMonitorProgress().start();
-						//cp newcp=new cp(url);
-						//newDownload.setInitInfo(newcp.getHttpdown().getFileName(), 0, newcp.getFileLength(), "0.00", 0);
-						//new cp(url);
+						System.out.println("Ææ¹ÖµÄÏß³Ì");
+						Thread threadCp=new Thread(newDownload.getNewcp());
+						System.out.println("write!");
+						threadCp.start();
 					}
 				} catch (IOException | InterruptedException e1) {
 					// TODO Auto-generated catch block

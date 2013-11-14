@@ -15,6 +15,7 @@ public class save_thread extends Thread {
 	private long beginPos=0,endPos=0,currentPos=0;
 	private int c;
 	private byte b[]=new byte[1024];
+	private boolean isPause=false;
 	/*public save_thread(String name){
 		this.name=name;
 	}*/
@@ -51,7 +52,7 @@ public class save_thread extends Thread {
 		}
 		// TODO Auto-generated method stub
 		try {
-			while((c=input.read(b,0,1024))>0){
+			while((c=input.read(b,0,1024))>0&&!isPause){
 				currentPos+=c;
 				if(currentPos>=endPos){//该块已传输结束
 					rfwrite.write(b, 0, (c-(int)((currentPos-endPos))));
@@ -67,6 +68,18 @@ public class save_thread extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public long getCurrentPos() {
+		return currentPos;
+	}
+
+	public long getEndPos() {
+		return endPos;
+	}
+
+	public void setPause(boolean isPause) {
+		this.isPause = isPause;
 	}
 	
 }

@@ -9,9 +9,11 @@
 package downloadUI;
 
 import downloadcore.cp;
-import actionListener.PanelMouseListener;
+//import actionListener.PanelMouseListener;
 
 import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -96,6 +98,10 @@ public class DownloadPanel extends JPanel{
 		this.isDownloaded = isDownloaded;
 	}
 
+	public cp getNewcp() {
+		return newcp;
+	}
+
 	public class MonitorProgress extends Thread{
 		public void run(){
 			while(!isDownloaded){
@@ -114,5 +120,46 @@ public class DownloadPanel extends JPanel{
 			newcp.monitorDownload();
 			setInitInfo(newcp.getHttpdown().getFileName(), newcp.getProgressReport().length(), newcp.getFileLength(), newcp.getProgressString(), newcp.getProgressValue());
 		}
+	}
+	class PanelMouseListener implements MouseListener{
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			if(2==e.getClickCount()){
+				//System.out.println("hello world");
+				if(false==newcp.isPause()){
+					//isPause=true;
+					newcp.setPause(true);
+				}
+				else{
+					newcp.setPause(false);
+				}
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
 	}
 }
